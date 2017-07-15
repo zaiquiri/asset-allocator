@@ -4,7 +4,7 @@ from random import shuffle
 ### KNOBS ###
 
 # How many shares to "back-off" from the naive starting allocation
-STARTING_BACKOFF = 1;
+STARTING_BACKOFF = 2;
 # How much over the golden allocation is too much to warrent continuing
 OVER_ALLOCATION_THRESHOLD = 1.05
 
