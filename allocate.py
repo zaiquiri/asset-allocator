@@ -21,7 +21,7 @@ def allocate(allocations, best_so_far):
     else:
         for purchase in purchase_options:
             add_purchase(purchase, allocations)
-            if new_combination(allocations):
+            if not seen_combination(allocations) and not gratutitous_allocation(purchase, allocations):
                 allocate(allocations, best_so_far)
             remove_purchase(purchase, allocations)
 
@@ -49,16 +49,19 @@ def remove_purchase(purchase_symbol, allocations):
     allocations[purchase_symbol] -= 1;
     allocations["cash"] += PRICES[purchase_symbol]
 
-def new_combination(allocations):
+def seen_combination(allocations):
     if (frozenset(allocations.items()) in SEEN_STATES):
-        return False
+        return True
     else:
         SEEN_STATES.add(frozenset(allocations.items()))
-        return True;
+        return False;
+
+def gratutitous_allocation(purchase, allocations):
+    return allocations[purchase] * PRICES[purchase] / PERFECT_AMOUNTS[purchase] > 1.05
 
 def get_starting_allocations(perfect_amounts):
     allocations = {}
-    optimization_buffer = 1
+    optimization_buffer = 2
     cash = TOTAL_CASH;
     for asset, amount in perfect_amounts.iteritems():
         if not asset == "cash":
