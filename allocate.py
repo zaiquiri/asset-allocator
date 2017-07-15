@@ -4,7 +4,7 @@ from random import shuffle
 ### KNOBS ###
 
 # How many shares to "back-off" from the naive starting allocation
-STARTING_BACKOFF = 2;
+STARTING_BACKOFF = 1;
 # How much over the golden allocation is too much to warrent continuing
 OVER_ALLOCATION_THRESHOLD = 1.05
 
@@ -20,7 +20,7 @@ def main():
     allocations = get_starting_allocations(PERFECT_AMOUNTS)
     BEST_SO_FAR["best"] = allocations.copy()
     allocate(allocations)
-    print "OPTIMAL ALLOCATION: " + str(BEST_SO_FAR["best"])
+    print_result(BEST_SO_FAR["best"])
 
 def allocate(allocations):
     purchase_options = get_possisible_purchases(allocations["cash"])
@@ -42,7 +42,6 @@ def get_possisible_purchases(cash):
     for symbol, price in PRICES.iteritems():
         if (cash - price >= 0):
             possisible_purchases.append(symbol)
-    shuffle(possisible_purchases)
     return possisible_purchases
 
 def get_avg_delta(allocations):
@@ -83,5 +82,22 @@ def get_starting_allocations(perfect_amounts):
             cash -= allocations[asset] * PRICES[asset]
     allocations["cash"] = cash
     return allocations
+
+def print_result(allocations):
+    print "================================================="
+    print "                OPTIMAL ALLOCATION"
+    print "================================================="
+    print "|\tSYM\t|\tSHARES\t|\tTOTAL\t|"
+    print "-------------------------------------------------"
+    total = 0;
+    for symbol, shares in allocations.iteritems():
+        if not symbol == "cash":
+            this_amount = round(PRICES[symbol]*shares, 2);
+            total += this_amount
+            print "|\t" + str(symbol) + "\t|\t" + str(shares) + "\t|\t" + str(this_amount) + "\t|"
+    print "|\tCASH\t|\t\t|\t" + str(TOTAL_CASH - total) + "\t|"
+    print "-------------------------------------------------"
+    
+
 
 if __name__ == "__main__": main()
