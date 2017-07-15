@@ -25,10 +25,11 @@ def main():
 def allocate(allocations):
     purchase_options = get_possisible_purchases(allocations["cash"])
     if not purchase_options:
-        current_avg_delta = get_avg_delta(allocations)
-        best_so_far_delta = get_avg_delta(BEST_SO_FAR["best"])
-        if (current_avg_delta < best_so_far_delta):
-            print "Best deviation so far " + str(current_avg_delta) + " ..."
+        current_score = get_score(allocations)
+        best_so_far_score = get_score(BEST_SO_FAR["best"])
+        if (current_score < best_so_far_score):
+            print "DEVIATION: " + str(current_score) + ", CASH:  " + str(round(allocations["cash"], 2))
+            print_result(allocations)
             BEST_SO_FAR["best"] = allocations.copy()
     else:
         for purchase in purchase_options:
@@ -44,7 +45,7 @@ def get_possisible_purchases(cash):
             possisible_purchases.append(symbol)
     return possisible_purchases
 
-def get_avg_delta(allocations):
+def get_score(allocations):
     total = 0;
     for asset, value in allocations.iteritems():
         if asset == "cash":
@@ -52,6 +53,7 @@ def get_avg_delta(allocations):
         else:
             total += abs(PERFECT_AMOUNTS[asset] - (allocations[asset] * PRICES[asset]))
     return total/len(allocations)
+    # return allocations["cash"]
 
 def add_purchase(purchase_symbol, allocations):
     allocations[purchase_symbol] += 1;
@@ -84,19 +86,19 @@ def get_starting_allocations(perfect_amounts):
     return allocations
 
 def print_result(allocations):
-    print "================================================="
-    print "                OPTIMAL ALLOCATION"
-    print "================================================="
-    print "|\tSYM\t|\tSHARES\t|\tTOTAL\t|"
-    print "-------------------------------------------------"
+    print "================================================================================="
+    print "                                 OPTIMAL ALLOCATION"
+    print "================================================================================="
+    print "|\tSYM\t|\tSHARES\t|\tTARGET\t|\tACTUAL\t|\tTOTAL\t|"
+    print "---------------------------------------------------------------------------------"
     total = 0;
     for symbol, shares in allocations.iteritems():
         if not symbol == "cash":
             this_amount = round(PRICES[symbol]*shares, 2);
             total += this_amount
-            print "|\t" + str(symbol) + "\t|\t" + str(shares) + "\t|\t" + str(this_amount) + "\t|"
-    print "|\tCASH\t|\t\t|\t" + str(TOTAL_CASH - total) + "\t|"
-    print "-------------------------------------------------"
+            print "|\t" + str(symbol) + "\t|\t" + str(shares) + "\t|\t" + str(TARGET_PERCENTAGES[symbol]) + "\t|\t" + str(round(this_amount/TOTAL_CASH, 2)) + "\t|\t" + str(this_amount) + "\t|"
+    print "|\tCASH\t|\t\t|\t0.00\t|\t" + str(round((TOTAL_CASH - total)/TOTAL_CASH, 2)) + "\t|\t" + str(TOTAL_CASH - total) + "\t|"
+    print "---------------------------------------------------------------------------------"
     
 
 
