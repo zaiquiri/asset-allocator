@@ -1,4 +1,5 @@
 import math
+import sys
 from random import shuffle
 
 ### KNOBS ###
@@ -7,6 +8,10 @@ from random import shuffle
 STARTING_BACKOFF = 2;
 # How much over the golden allocation is too much to warrent continuing
 OVER_ALLOCATION_THRESHOLD = 1.05
+# How much over/under target allocation can still be considered "perfect"
+ALLOCATION_TOLERANCE = .025
+# How important not having leftover cash is
+CASH_WEIGHT = 7
 
 # GLOBALS
 PRICES = {"VTI":126.23, "VEA":42.07, "VWO":42.52, "VIG":93.49, "VNQ":83.08, "VCIT":87.7, "VWOB":80.04}
@@ -15,21 +20,20 @@ TOTAL_CASH = 19205.71
 PERFECT_AMOUNTS = {k: TOTAL_CASH*TARGET_PERCENTAGES.get(k) for k in TARGET_PERCENTAGES.keys() }
 SEEN_STATES = set()
 BEST_SO_FAR = {"best":{}}
+BEST_DISTANCE = [sys.maxint]
 
 def main():
     allocations = get_starting_allocations(PERFECT_AMOUNTS)
     BEST_SO_FAR["best"] = allocations.copy()
+    is_better(BEST_SO_FAR["best"])
     allocate(allocations)
     print_result(BEST_SO_FAR["best"])
 
 def allocate(allocations):
     purchase_options = get_possisible_purchases(allocations["cash"])
     if not purchase_options:
-        current_score = get_score(allocations)
-        best_so_far_score = get_score(BEST_SO_FAR["best"])
-        if (current_score < best_so_far_score):
-            print "DEVIATION: " + str(current_score) + ", CASH:  " + str(round(allocations["cash"], 2))
-            print_result(allocations)
+        if (is_better(allocations)):
+            print allocations
             BEST_SO_FAR["best"] = allocations.copy()
     else:
         for purchase in purchase_options:
@@ -45,15 +49,19 @@ def get_possisible_purchases(cash):
             possisible_purchases.append(symbol)
     return possisible_purchases
 
-def get_score(allocations):
-    total = 0;
+def is_better(allocations):
+    total_dollars_from_perfect = 0;
+    uninvested_cash = allocations["cash"]
     for asset, value in allocations.iteritems():
-        if asset == "cash":
-            total += allocations["cash"]
-        else:
-            total += abs(PERFECT_AMOUNTS[asset] - (allocations[asset] * PRICES[asset]))
-    return total/len(allocations)
-    # return allocations["cash"]
+        if not asset == "cash":
+            dollars_from_perfect = abs(PERFECT_AMOUNTS[asset] - PRICES[asset]*allocations[asset])
+            total_dollars_from_perfect += dollars_from_perfect if (dollars_from_perfect/PERFECT_AMOUNTS[asset]) > ALLOCATION_TOLERANCE else 0
+    distance_from_perfect = math.sqrt((uninvested_cash*CASH_WEIGHT)**2 + total_dollars_from_perfect**2)
+    if (distance_from_perfect < BEST_DISTANCE[0]):
+        print "DIST: " + str(distance_from_perfect)
+        BEST_DISTANCE[0] = distance_from_perfect
+        return True
+    return False
 
 def add_purchase(purchase_symbol, allocations):
     allocations[purchase_symbol] += 1;
