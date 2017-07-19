@@ -4,37 +4,39 @@ from random import shuffle
 
 ### KNOBS ###
 
+### ---PERFORMANCE--- ###
 # How many shares to "back-off" from the naive starting allocation
 STARTING_BACKOFF = 2;
 # How much over the golden allocation is too much to warrent continuing
 OVER_ALLOCATION_THRESHOLD = 1.05
+### ---ACCURACY--- ###
 # How much over/under target allocation can still be considered "perfect"
 ALLOCATION_TOLERANCE = .025
 # How important not having leftover cash is
-CASH_WEIGHT = 7
+CASH_WEIGHT = 12
 
 # GLOBALS
-PRICES = {"VTI":126.23, "VEA":42.07, "VWO":42.52, "VIG":93.49, "VNQ":83.08, "VCIT":87.7, "VWOB":80.04}
+PRICES = {"VTI":126.31, "VEA":42.09, "VWO":42.37, "VIG":93.36, "VNQ":83.57, "VCIT":88, "VWOB":80.23}
 TARGET_PERCENTAGES = {"VTI":0.21, "VEA":0.18, "VWO":0.22, "VIG":0.13, "VNQ":0.16, "VCIT":0.05, "VWOB":0.05, "cash":0}
 TOTAL_CASH = 19205.71
 PERFECT_AMOUNTS = {k: TOTAL_CASH*TARGET_PERCENTAGES.get(k) for k in TARGET_PERCENTAGES.keys() }
 SEEN_STATES = set()
-BEST_SO_FAR = {"best":{}}
+BEST_SO_FAR = [None]
 BEST_DISTANCE = [sys.maxint]
 
 def main():
     allocations = get_starting_allocations(PERFECT_AMOUNTS)
-    BEST_SO_FAR["best"] = allocations.copy()
-    is_better(BEST_SO_FAR["best"])
+    BEST_SO_FAR[0] = allocations.copy()
+    is_better(BEST_SO_FAR[0])
     allocate(allocations)
-    print_result(BEST_SO_FAR["best"])
+    print_result(BEST_SO_FAR[0])
 
 def allocate(allocations):
     purchase_options = get_possisible_purchases(allocations["cash"])
     if not purchase_options:
         if (is_better(allocations)):
             print allocations
-            BEST_SO_FAR["best"] = allocations.copy()
+            BEST_SO_FAR[0] = allocations.copy()
     else:
         for purchase in purchase_options:
             add_purchase(purchase, allocations)
