@@ -106,7 +106,7 @@ def print_result(allocations):
         if not symbol == "cash":
             this_amount = round(PRICES[symbol]*shares, 2);
             total += this_amount
-            print "|\t" + str(symbol) + "\t|\t" + str(shares) + "\t|\t" + str(TARGET_PERCENTAGES[symbol]) + "\t|\t" + str(round(this_amount/TOTAL_CASH, 2)) + "\t|\t" + str(this_amount) + "\t|"
+            print "|\t" + str(symbol) + "\t|\t" + str(shares) + "\t|\t" + str(TARGET_PERCENTAGES[symbol]) + "\t|\t" + str(round(this_amount/TOTAL_CASH, 4)) + "\t|\t" + str(this_amount) + "\t|"
     print "|\tCASH\t|\t\t|\t0.00\t|\t" + str(round((TOTAL_CASH - total)/TOTAL_CASH, 2)) + "\t|\t" + str(TOTAL_CASH - total) + "\t|"
     print "---------------------------------------------------------------------------------"
     
