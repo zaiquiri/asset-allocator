@@ -1,6 +1,6 @@
 import math
 import sys
-from random import shuffle
+from yahoo_finance import Share
 
 ### KNOBS ###
 
@@ -16,7 +16,8 @@ ALLOCATION_TOLERANCE = .025
 CASH_WEIGHT = 12
 
 # GLOBALS
-PRICES = {"VTI":126.31, "VEA":42.09, "VWO":42.37, "VIG":93.36, "VNQ":83.57, "VCIT":88, "VWOB":80.23}
+STOCKS = ["VTI", "VEA", "VWO", "VIG", "VNQ", "VCIT", "VWOB"]
+PRICES = {k: float(Share(k).get_price()) for k in STOCKS}
 TARGET_PERCENTAGES = {"VTI":0.21, "VEA":0.18, "VWO":0.22, "VIG":0.13, "VNQ":0.16, "VCIT":0.05, "VWOB":0.05, "cash":0}
 TOTAL_CASH = 19205.71
 PERFECT_AMOUNTS = {k: TOTAL_CASH*TARGET_PERCENTAGES.get(k) for k in TARGET_PERCENTAGES.keys() }
@@ -109,7 +110,5 @@ def print_result(allocations):
             print "|\t" + str(symbol) + "\t|\t" + str(shares) + "\t|\t" + str(TARGET_PERCENTAGES[symbol]) + "\t|\t" + str(round(this_amount/TOTAL_CASH, 4)) + "\t|\t" + str(this_amount) + "\t|"
     print "|\tCASH\t|\t\t|\t0.00\t|\t" + str(round((TOTAL_CASH - total)/TOTAL_CASH, 2)) + "\t|\t" + str(TOTAL_CASH - total) + "\t|"
     print "---------------------------------------------------------------------------------"
-    
-
 
 if __name__ == "__main__": main()
