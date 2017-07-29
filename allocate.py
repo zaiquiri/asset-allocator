@@ -11,15 +11,15 @@ STARTING_BACKOFF = 2;
 OVER_ALLOCATION_THRESHOLD = 1.05
 ### ---ACCURACY--- ###
 # How much over/under target allocation can still be considered "perfect"
-ALLOCATION_TOLERANCE = .025
+ALLOCATION_TOLERANCE = 0
 # How important not having leftover cash is
-CASH_WEIGHT = 12
+CASH_WEIGHT = 1
 
 # GLOBALS
 STOCKS = ["VTI", "VEA", "VWO", "VIG", "VNQ", "VCIT", "VWOB"]
 PRICES = {k: float(Share(k).get_price()) for k in STOCKS}
-TARGET_PERCENTAGES = {"VTI":0.21, "VEA":0.18, "VWO":0.22, "VIG":0.13, "VNQ":0.16, "VCIT":0.05, "VWOB":0.05, "cash":0}
-TOTAL_CASH = 19205.71
+TARGET_PERCENTAGES = {"VTI":0.23, "VEA":0.19, "VWO":0.17, "VIG":0.15, "VNQ":0.15, "VCIT":0.05, "VWOB":0.06, "cash":0}
+TOTAL_CASH = 13677.68
 PERFECT_AMOUNTS = {k: TOTAL_CASH*TARGET_PERCENTAGES.get(k) for k in TARGET_PERCENTAGES.keys() }
 SEEN_STATES = set()
 BEST_SO_FAR = [None]
