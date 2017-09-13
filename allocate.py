@@ -15,12 +15,17 @@ ALLOCATION_TOLERANCE = 0
 # How important not having leftover cash is
 CASH_WEIGHT = 1
 
-# GLOBALS
-STOCKS = ["VTI", "VEA", "VWO", "VIG", "VNQ", "VCIT", "VWOB"]
-PRICES = {k: float(Share(k).get_price()) for k in STOCKS}
-TARGET_PERCENTAGES = {"VTI":0.23, "VEA":0.19, "VWO":0.17, "VIG":0.15, "VNQ":0.15, "VCIT":0.05, "VWOB":0.06, "cash":0}
-TOTAL_CASH = 13677.68
-PERFECT_AMOUNTS = {k: TOTAL_CASH*TARGET_PERCENTAGES.get(k) for k in TARGET_PERCENTAGES.keys() }
+def get_securities():
+    return ["VTI", "VEA", "VWO", "VIG", "VNQ", "VCIT", "VWOB"]
+
+def get_targets():
+    return {"VTI":0.23, "VEA":0.19, "VWO":0.17, "VIG":0.15, "VNQ":0.15, "VCIT":0.05, "VWOB":0.06, "cash":0}
+
+def get_total_cash():
+    return 14873.24
+
+PRICES = {k: float(Share(k).get_price()) for k in get_securities()}
+PERFECT_AMOUNTS = {k: get_total_cash()*get_targets().get(k) for k in get_targets().keys() }
 SEEN_STATES = set()
 BEST_SO_FAR = [None]
 BEST_DISTANCE = [sys.maxint]
@@ -31,6 +36,7 @@ def main():
     is_better(BEST_SO_FAR[0])
     allocate(allocations)
     print_result(BEST_SO_FAR[0])
+    print_instructions(BEST_SO_FAR[0])
 
 def allocate(allocations):
     purchase_options = get_possisible_purchases(allocations["cash"])
@@ -88,7 +94,7 @@ def gratutitous_allocation(purchase, allocations):
 
 def get_starting_allocations(perfect_amounts):
     allocations = {}
-    cash = TOTAL_CASH;
+    cash = get_total_cash();
     for asset, amount in perfect_amounts.iteritems():
         if not asset == "cash":
             allocations[asset] = math.floor(perfect_amounts[asset] / PRICES[asset]) - STARTING_BACKOFF
@@ -107,8 +113,21 @@ def print_result(allocations):
         if not symbol == "cash":
             this_amount = round(PRICES[symbol]*shares, 2);
             total += this_amount
-            print "|\t" + str(symbol) + "\t|\t" + str(shares) + "\t|\t" + str(TARGET_PERCENTAGES[symbol]) + "\t|\t" + str(round(this_amount/TOTAL_CASH, 4)) + "\t|\t" + str(this_amount) + "\t|"
-    print "|\tCASH\t|\t\t|\t0.00\t|\t" + str(round((TOTAL_CASH - total)/TOTAL_CASH, 2)) + "\t|\t" + str(TOTAL_CASH - total) + "\t|"
+            print "|\t" + str(symbol) + "\t|\t" + str(shares) + "\t|\t" + str(get_targets()[symbol]) + "\t|\t" + str(round(this_amount/get_total_cash(), 4)) + "\t|\t" + str(this_amount) + "\t|"
+    print "|\tCASH\t|\t\t|\t0.00\t|\t" + str(round((get_total_cash() - total)/get_total_cash(), 2)) + "\t|\t" + str(get_total_cash() - total) + "\t|"
     print "---------------------------------------------------------------------------------"
+
+def print_instructions(allocations):
+    current_holdings = get_current_holdings()
+    for symbol, desired_shares in allocations.iteritems():
+        if not symbol == "cash":
+            diff = desired_shares - current_holdings[symbol]
+            if (diff < 0):
+                print "SELL " + symbol + ": " + str(abs(diff))
+            if (diff > 0):
+                print "BUY " + symbol + ": " + str(diff)
+
+def get_current_holdings():
+    return {"VTI":25, "VEA":60, "VWO":53, "VIG":22, "VNQ":24, "VCIT":8, "VWOB":10}
 
 if __name__ == "__main__": main()
