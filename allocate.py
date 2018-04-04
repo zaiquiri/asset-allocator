@@ -23,12 +23,12 @@ def get_targets():
     return {"VTI":0.23, "VEA":0.19, "VWO":0.17, "VIG":0.15, "VNQ":0.15, "VCIT":0.05, "VWOB":0.06, "cash":0}
 
 def get_current_holdings():
-    return {"VTI":31.268, "VEA":76.985, "VWO":67.95, "VIG":28.25, "VNQ":31.747, "VCIT":10.136, "VWOB":13.255}
+    return {"VTI":39.430, "VEA":97.340, "VWO":84.110, "VIG":34.385, "VNQ":47.183, "VCIT":14.199, "VWOB":18.352}
 
 def get_total_cash():
-    return 23990.96
+    return 25147.76
 
-PRICES = {"VTI": 141.81, "VEA": 46.21 , "VWO": 48.47, "VIG": 105.30, "VNQ": 76.57, "VCIT": 85.54, "VWOB": 79.10}
+PRICES = {'VTI': 134.28, 'VEA': 43.93, 'VWO': 46.74, 'VIG': 100.09, 'VNQ': 75.08, 'VCIT': 84.35, 'VWOB': 77.99}
 PERFECT_AMOUNTS = {k: get_total_cash()*get_targets().get(k) for k in get_targets().keys() }
 SEEN_STATES = set()
 BEST_SO_FAR = [None]
